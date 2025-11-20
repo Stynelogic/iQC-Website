@@ -721,7 +721,7 @@
             const ctx = canvas.getContext('2d');
             
             let width, height;
-            const scaleFactor = 4; 
+            const scaleFactor = 2; // Ultra thin lines
             let simWidth, simHeight;
             let buffer1, buffer2;
 
@@ -738,8 +738,12 @@
             }
 
             let mouseX = 0, mouseY = 0;
+            let tick = 0;
 
             window.addEventListener('mousemove', function(e) {
+                tick++;
+                if (tick % 5 !== 0) return; // Frequency down to 0.20 (1/5th)
+
                 mouseX = Math.floor(e.clientX / scaleFactor);
                 mouseY = Math.floor(e.clientY / scaleFactor);
                 if(mouseX > 1 && mouseX < simWidth - 1 && mouseY > 1 && mouseY < simHeight - 1) {
@@ -771,18 +775,27 @@
 
                 for (let i = 0; i < len; i++) {
                     const val = buffer2[i];
-                    // Subtle light grey shading logic
-                    let darkness = val * 0.2; // Reduced intensity for subtlety
-                    let pixelVal = 255 - darkness;
+                    // Subtle light cyan-electric blue shading
+                    // We want white background (255,255,255). Ripples darken Red/Green to reveal Cyan/Blue.
                     
-                    if (pixelVal > 255) pixelVal = 255;
-                    if (pixelVal < 245) pixelVal = 245; // Floor at 245 for ultra-light grey
+                    let intensity = val * 0.05; // Extremely subtle
+                    if (intensity < 0) intensity = 0; // Ignore troughs for cleaner look
 
+                    // Target: Electric Blueish Cyan. 
+                    // Red drops the most, Green drops a bit, Blue stays high.
+                    let r = 255 - (intensity * 2.5); 
+                    let g = 255 - (intensity * 0.5);
+                    let b = 255;
+
+                    // Clamp and Floor for "barely noticeable" effect
+                    if (r < 240) r = 240; 
+                    if (g < 250) g = 250;
+                    
                     const idx = i * 4;
-                    data[idx] = pixelVal;
-                    data[idx+1] = pixelVal;
-                    data[idx+2] = pixelVal;
-                    data[idx+3] = 255;
+                    data[idx] = r;     // Red
+                    data[idx+1] = g;   // Green
+                    data[idx+2] = b;   // Blue
+                    data[idx+3] = 255; // Alpha
                 }
 
                 const tempCanvas = document.createElement('canvas');
