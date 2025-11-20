@@ -75,7 +75,7 @@
             opacity: 0.5;
         }
         
-        .cursor-outer::before { width: 120%; height: 120%; border-color: var(--accent-blue); border-style: dashed; animation: spin 10s linear infinite; }
+        .cursor-outer::before { width: 120%; height: 120%; border-color: var(--text-muted); border-style: dashed; animation: spin 10s linear infinite; }
         
         @keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
 
@@ -246,6 +246,7 @@
             border: 2px solid #999;
             border-radius: 12px;
             position: relative;
+            align-self: center;
         }
 
         .wheel {
