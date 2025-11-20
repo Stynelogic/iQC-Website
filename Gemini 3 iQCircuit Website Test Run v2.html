@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iQ Circuit | Intelligent Innovation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --slab-bg: #0a0a0a; /* Richer, deeper black */
+            --accent-blue: #2dacdc;
+            --accent-hover: #1e8ab5;
+            --text-white: #f4f4f4;
+            --text-muted: #a0a0a0;
+            --text-black: #111111;
+            --border-color: rgba(255,255,255,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-black);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Background Canvas --- */
+        #milkCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            color: var(--text-black);
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            color: var(--accent-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-black);
+            font-weight: 500;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent-blue);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cta-btn {
+            background-color: var(--text-black);
+            color: white !important;
+            padding: 12px 28px;
+            border-radius: 2px; /* Sharp corporate look */
+            transition: all 0.3s ease;
+        }
+
+        .cta-btn:hover {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .cta-btn::after { display: none !important; }
+
+        /* --- Hero Section --- */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start; /* Left align for corporate feel */
+            padding: 0 10%; /* More padding */
+            pointer-events: none;
+        }
+
+        header * { pointer-events: auto; }
+
+        .hero-content {
+            max-width: 800px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease-out forwards 0.5s;
+        }
+
+        .overline {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            color: #000;
+        }
+
+        .tagline {
+            font-size: 1.35rem;
+            color: #555;
+            margin-bottom: 50px;
+            max-width: 600px;
+            font-weight: 300;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+            animation: fadeUp 1s ease-out forwards 1.5s;
+            opacity: 0;
+        }
+
+        .mouse-icon {
+            width: 24px;
+            height: 36px;
+            border: 2px solid #999;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .wheel {
+            width: 2px;
+            height: 6px;
+            background: #999;
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scrollWheel 2s infinite;
+        }
+
+        /* --- Slabs --- */
+        .container {
+            width: 100%;
+            padding-bottom: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 180px;
+            overflow: hidden;
+        }
+
+        .slab-wrapper {
+            display: flex;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        .slab-wrapper.right { justify-content: flex-end; }
+
+        .slab {
+            background-color: var(--slab-bg);
+            color: var(--text-white);
+            padding: 80px 10%; /* Generous corporate padding */
+            width: 75%;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            border-left: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-color);
+            opacity: 0;
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); /* Sophisticated ease */
+            z-index: 10;
+        }
+
+        .slab-wrapper.left .slab { transform: translateX(-100px); border-radius: 0 4px 4px 0; }
+        .slab-wrapper.right .slab { transform: translateX(100px); border-radius: 4px 0 0 4px; }
+
+        .slab.visible {
+            opacity: 1;
+            transform: translateX(0) !important;
+        }
+
+        /* Slab Typography & Elements */
+        .slab-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+        }
+
+        .slab h2 {
+            font-size: 3rem;
+            letter-spacing: -1px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .slab-subtitle {
+            color: var(--accent-blue);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+        }
+
+        .slab p {
+            font-size: 1.15rem;
+            color: #ccc;
+            margin-bottom: 30px;
+            max-width: 800px;
+            font-weight: 300;
+        }
+
+        /* Service Pills Grid */
+        .services-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .service-pill {
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--text-white);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .service-pill:hover {
+            border-color: var(--accent-blue);
+            background: rgba(45, 172, 220, 0.1);
+            color: var(--accent-blue);
+        }
+
+        /* --- Leadership Section --- */
+        .leadership-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 5%;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 80px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .team-card {
+            background: white;
+            border: 1px solid #eee;
+            padding: 40px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        }
+
+        .team-role {
+            color: var(--accent-blue);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .team-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .team-bio {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .team-credentials {
+            font-size: 0.8rem;
+            color: #999;
+            font-weight: 500;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        /* --- Footer --- */
+        .main-footer {
+            background-color: #050505;
+            color: white;
+            padding: 80px 5% 40px;
+            margin-top: 100px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h5 {
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 15px;
+        }
+
+        .footer-col ul li a {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--accent-blue);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            color: #555;
+            font-size: 0.85rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .footer-desc {
+            color: #888;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-width: 300px;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scrollWheel {
+            0% { top: 6px; opacity: 1; }
+            100% { top: 18px; opacity: 0; }
+        }
+
+        /* --- Mobile --- */
+        @media (max-width: 1024px) {
+            .slab { width: 90%; padding: 60px 30px; }
+            h1 { font-size: 3.5rem; }
+            .footer-content { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.8rem; }
+            header { padding: 0 20px; }
+            .nav-links { display: none; } /* Simple approach for this demo */
+            .slab-wrapper { justify-content: center !important; }
+            .slab { width: 95%; transform: translateY(50px); }
+            .footer-content { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- High Performance Interactive Background -->
+    <canvas id="milkCanvas"></canvas>
+
+    <nav>
+        <div class="logo">iQ<span>Circuit</span></div>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#services">Services</a>
+            <a href="#team">Leadership</a>
+            <a href="#contact" class="cta-btn">Contact Us</a>
+        </div>
+    </nav>
+
+    <header>
+        <div class="hero-content">
+            <span class="overline">Intelligent Innovation</span>
+            <h1>Unlocking Value.<br>Accelerating Growth.</h1>
+            <p class="tagline">We are a boutique consulting firm transforming business operations through Financial Advisory, Strategy, and AI Analytics.</p>
+        </div>
+        <div class="scroll-indicator">
+            <div class="mouse-icon"><div class="wheel"></div></div>
+            <span>Scroll</span>
+        </div>
+    </header>
+
+    <div class="container" id="services">
+        
+        <!-- Slab 1: About -->
+        <div class="slab-wrapper left" id="about">
+            <div class="slab">
+                <div class="slab-header">
+                    <span class="slab-subtitle">Who We Are</span>
+                    <h2>The Firm</h2>
+                </div>
+                <p>iQ Circuit is dedicated to unlocking value for our clients by transforming their business operations and accelerating sustainable growth. We navigate complexity to deliver clarity.</p>
+                <div class="services-grid">
+                    <div class="service-pill">Boutique Consulting</div>
+                    <div class="service-pill">Sustainable Growth</div>
+                    <div class="service-pill">Global Expertise</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slab 2: Financial Advisory -->
+        <div class="slab-wrapper right">
+            <div class="slab">
+                <div class="slab-header">
+                    <span class="slab-subtitle">Core Pillar 01</span>
+                    <h2>Financial Advisory</h2>
+                </div>
+                <p>Data-informed strategies aimed at enhancing competitive advantages. Our offerings are backed by extensive industry experience and specialized knowledge, ensuring alignment with client interests.</p>
+                <div class="services-grid">
+                    <div class="service-pill">Mergers & Acquisitions</div>
+                    <div class="service-pill">Capital Raising</div>
+                    <div class="service-pill">Business Valuations</div>
+                    <div class="service-pill">Financial Due Diligence</div>
+                    <div class="service-pill">Project Finance</div>
+                    <div class="service-pill">Corporate Strategy</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slab 3: Strategy -->
+        <div class="slab-wrapper left">
+            <div class="slab">
+                <div class="slab-header">
+                    <span class="slab-subtitle">Core Pillar 02</span>
+                    <h2>Finance & Business Strategy</h2>
+                </div>
+                <p>Enhancing financial management and business strategy by leveraging unique expertise. We support growth through strategic guidance in Market Entry, Digital Transformation, and Business Model Innovation.</p>
+                <div class="services-grid">
+                    <div class="service-pill">Platform Implementation</div>
+                    <div class="service-pill">Intelligent Data Mgmt</div>
+                    <div class="service-pill">Financial Modeling</div>
+                    <div class="service-pill">Budgeting & Forecasting</div>
+                    <div class="service-pill">Digital Transformation</div>
+                    <div class="service-pill">Market Expansion</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slab 4: AI -->
+        <div class="slab-wrapper right">
+            <div class="slab">
+                <div class="slab-header">
+                    <span class="slab-subtitle">Core Pillar 03</span>
+                    <h2>AI & Business Analytics</h2>
+                </div>
+                <p>Operational resilience through intelligent automation. A central aspect of our approach is embedded ethical AI governance, ensuring compliance, transparency, and smooth human-AI collaboration.</p>
+                <div class="services-grid">
+                    <div class="service-pill">Process Automation</div>
+                    <div class="service-pill">AI Agent Development</div>
+                    <div class="service-pill">NLP Solutions</div>
+                    <div class="service-pill">Predictive Analytics</div>
+                    <div class="service-pill">Ethical AI Governance</div>
+                    <div class="service-pill">Data Fine-Tuning</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="leadership-section" id="team">
+        <h2 class="section-title">Our Leadership</h2>
+        <div class="team-grid">
+            <!-- Partner 1 -->
+            <div class="team-card">
+                <span class="team-role">Partner: Financial Advisory</span>
+                <h3 class="team-name">Denzil T. Mutsikiwa</h3>
+                <p class="team-bio">An experienced leader in finance and investment, Denzil has managed portfolios worth over US$200M and completed transactions exceeding US$100M.</p>
+                <div class="team-credentials">ACCA, CFA L3 Candidate, MBA Georgetown</div>
+            </div>
+
+            <!-- Partner 2 -->
+            <div class="team-card">
+                <span class="team-role">Partner: Finance & Strategy</span>
+                <h3 class="team-name">Tinayeshe Tiboni</h3>
+                <p class="team-bio">A dedicated business strategist and serial entrepreneur. Tinayeshe specializes in tech-enabled business processes and financial management.</p>
+                <div class="team-credentials">Honours in Business & CS, Joshua Nkomo Scholar</div>
+            </div>
+
+            <!-- Partner 3 -->
+            <div class="team-card">
+                <span class="team-role">Partner: AI & Analytics</span>
+                <h3 class="team-name">Kudzaishe Shoko</h3>
+                <p class="team-bio">With a background in computer science and digital marketing, Kudzi leads the development of AI-powered solutions that streamline operations.</p>
+                <div class="team-credentials">Certified in AI & Data Science</div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-col">
+                <div class="footer-logo">iQ<span>Circuit</span></div>
+                <p class="footer-desc">Transforming business operations and accelerating sustainable growth through intelligent innovation.</p>
+                <br>
+                <p class="footer-desc">Zimbabwe & USA</p>
+            </div>
+            <div class="footer-col">
+                <h5>Services</h5>
+                <ul>
+                    <li><a href="#">Financial Advisory</a></li>
+                    <li><a href="#">Business Strategy</a></li>
+                    <li><a href="#">AI Implementation</a></li>
+                    <li><a href="#">Data Analytics</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Company</h5>
+                <ul>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#team">Leadership</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Insights</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Contact</h5>
+                <ul>
+                    <li><a href="mailto:info@iqcircuit.com">info@iqcircuit.com</a></li>
+                    <li><a href="#">+263 774 133 411</a></li>
+                    <li><a href="#">+1 202 815 8222</a></li>
+                    <li><a href="https://iqcircuit.com">iqcircuit.com</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>&copy; 2025 iQ Circuit. All Rights Reserved.</div>
+            <div>
+                <a href="#" style="color: #555; text-decoration: none; margin-left: 20px;">Privacy Policy</a>
+                <a href="#" style="color: #555; text-decoration: none; margin-left: 20px;">Terms of Use</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Functionality Scripts -->
+    <script>
+        // --- Slab Animation Logic ---
+        document.addEventListener("DOMContentLoaded", function() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.2 // Wait until 20% is visible for a deliberate reveal
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            const slabs = document.querySelectorAll('.slab');
+            slabs.forEach(slab => {
+                observer.observe(slab);
+            });
+        });
+
+        // --- Milk Ripple Effect Logic (Light Grey to White) ---
+        (function() {
+            const canvas = document.getElementById('milkCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width, height;
+            const scaleFactor = 4; 
+            let simWidth, simHeight;
+            let buffer1, buffer2;
+
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                simWidth = Math.ceil(width / scaleFactor);
+                simHeight = Math.ceil(height / scaleFactor);
+                const size = simWidth * simHeight;
+                buffer1 = new Int16Array(size);
+                buffer2 = new Int16Array(size);
+            }
+
+            let mouseX = 0, mouseY = 0;
+
+            window.addEventListener('mousemove', function(e) {
+                mouseX = Math.floor(e.clientX / scaleFactor);
+                mouseY = Math.floor(e.clientY / scaleFactor);
+                if(mouseX > 1 && mouseX < simWidth - 1 && mouseY > 1 && mouseY < simHeight - 1) {
+                    buffer1[mouseX + mouseY * simWidth] = 300; 
+                }
+            });
+
+            window.addEventListener('resize', resize);
+            resize();
+
+            function update() {
+                const temp = buffer1;
+                buffer1 = buffer2;
+                buffer2 = temp;
+
+                const len = simWidth * simHeight;
+                for (let i = simWidth; i < len - simWidth; i++) {
+                    let val = (buffer1[i - 1] + buffer1[i + 1] + buffer1[i - simWidth] + buffer1[i + simWidth]) >> 1; 
+                    val -= buffer2[i];
+                    val -= val >> 5; 
+                    buffer2[i] = val;
+                }
+            }
+
+            function draw() {
+                const imgData = ctx.createImageData(simWidth, simHeight);
+                const data = imgData.data;
+                const len = simWidth * simHeight;
+
+                for (let i = 0; i < len; i++) {
+                    const val = buffer2[i];
+                    // Subtle light grey shading logic
+                    let darkness = val * 0.2; // Reduced intensity for subtlety
+                    let pixelVal = 255 - darkness;
+                    
+                    if (pixelVal > 255) pixelVal = 255;
+                    if (pixelVal < 245) pixelVal = 245; // Floor at 245 for ultra-light grey
+
+                    const idx = i * 4;
+                    data[idx] = pixelVal;
+                    data[idx+1] = pixelVal;
+                    data[idx+2] = pixelVal;
+                    data[idx+3] = 255;
+                }
+
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = simWidth;
+                tempCanvas.height = simHeight;
+                tempCanvas.getContext('2d').putImageData(imgData, 0, 0);
+
+                ctx.clearRect(0, 0, width, height);
+                ctx.imageSmoothingEnabled = true; 
+                ctx.drawImage(tempCanvas, 0, 0, width, height);
+            }
+
+            function loop() {
+                update();
+                draw();
+                requestAnimationFrame(loop);
+            }
+            loop();
+        })();
+    </script>
+
+</body>
+</html>
