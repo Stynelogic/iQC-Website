@@ -40,13 +40,12 @@
             left: 0;
             width: 40px;
             height: 40px;
-            border: 2px solid var(--accent-blue);
+            border: 2px solid #666;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 9999;
             transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s;
-            mix-blend-mode: difference;
         }
 
         .cursor-inner {
@@ -55,12 +54,12 @@
             left: 0;
             width: 8px;
             height: 8px;
-            background-color: var(--accent-blue);
+            background-color: #666;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 10000;
-            transition: width 0.2s, height 0.2s;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
         }
 
         /* Techy Accents on Cursor */
@@ -83,14 +82,14 @@
         body.hovering .cursor-outer {
             width: 60px;
             height: 60px;
-            background-color: rgba(45, 172, 220, 0.1);
-            border-color: var(--accent-blue);
+            background-color: rgba(102, 102, 102, 0.1);
+            border-color: #888;
         }
 
         body.hovering .cursor-inner {
             width: 12px;
             height: 12px;
-            background-color: #fff;
+            background-color: #888;
         }
 
         /* --- Background Canvas --- */
@@ -721,7 +720,7 @@
             const ctx = canvas.getContext('2d');
             
             let width, height;
-            const scaleFactor = 2; // Ultra thin lines
+            const scaleFactor = 1; // Ultra thin lines
             let simWidth, simHeight;
             let buffer1, buffer2;
 
@@ -742,7 +741,7 @@
 
             window.addEventListener('mousemove', function(e) {
                 tick++;
-                if (tick % 5 !== 0) return; // Frequency down to 0.20 (1/5th)
+                if (tick % 10 !== 0) return; // Frequency down to 0.20 (1/5th)
 
                 mouseX = Math.floor(e.clientX / scaleFactor);
                 mouseY = Math.floor(e.clientY / scaleFactor);
@@ -778,8 +777,8 @@
                     // Subtle light cyan-electric blue shading
                     // We want white background (255,255,255). Ripples darken Red/Green to reveal Cyan/Blue.
                     
-                    let intensity = val * 0.05; // Extremely subtle
-                    if (intensity < 0) intensity = 0; // Ignore troughs for cleaner look
+                    let intensity = val * 5; // Extremely subtle
+                    if (intensity < 0) intensity = 1; // Ignore troughs for cleaner look
 
                     // Target: Electric Blueish Cyan. 
                     // Red drops the most, Green drops a bit, Blue stays high.
