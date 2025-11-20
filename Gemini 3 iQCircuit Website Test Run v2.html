@@ -40,7 +40,7 @@
             left: 0;
             width: 40px;
             height: 40px;
-            border: 2px solid #666;
+            border: 2px solid var(--accent-blue);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
@@ -54,7 +54,7 @@
             left: 0;
             width: 8px;
             height: 8px;
-            background-color: #666;
+            background-color: var(--accent-blue);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
@@ -82,14 +82,14 @@
         body.hovering .cursor-outer {
             width: 60px;
             height: 60px;
-            background-color: rgba(102, 102, 102, 0.1);
-            border-color: #888;
+            background-color: rgba(45, 172, 220, 0.1);
+            border-color: var(--accent-blue);
         }
 
         body.hovering .cursor-inner {
             width: 12px;
             height: 12px;
-            background-color: #888;
+            background-color: var(--accent-blue);
         }
 
         /* --- Background Canvas --- */
@@ -741,7 +741,7 @@
 
             window.addEventListener('mousemove', function(e) {
                 tick++;
-                if (tick % 10 !== 0) return; // Frequency down to 0.20 (1/5th)
+                if (tick % 10 !== 0) return; // Frequency toggle
 
                 mouseX = Math.floor(e.clientX / scaleFactor);
                 mouseY = Math.floor(e.clientY / scaleFactor);
@@ -777,7 +777,7 @@
                     // Subtle light cyan-electric blue shading
                     // We want white background (255,255,255). Ripples darken Red/Green to reveal Cyan/Blue.
                     
-                    let intensity = val * 5; // Extremely subtle
+                    let intensity = val * 5; // Subtle
                     if (intensity < 0) intensity = 1; // Ignore troughs for cleaner look
 
                     // Target: Electric Blueish Cyan. 
@@ -787,8 +787,8 @@
                     let b = 255;
 
                     // Clamp and Floor for "barely noticeable" effect
-                    if (r < 240) r = 240; 
-                    if (g < 250) g = 250;
+                    if (r < 220) r = 220; 
+                    if (g < 240) g = 240;
                     
                     const idx = i * 4;
                     data[idx] = r;     // Red
